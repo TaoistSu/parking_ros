@@ -1,0 +1,13 @@
+
+roslaunch car_description final_project.launch
+
+
+rosservice call /planner/trigger_planner "use_default: true
+goal:
+ x: 25.1592
+ y: -8.16411
+ z: 4.014"
+
+
+修改停车位置
+/home/light/violet_ws/src/Autonomous_Parking_ROS/ara_star_planner/launch/planner.launch

@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <arg name="enable_planner" default="true" />
+  <arg name="enable_dynamic_obstacle" default="true" />
+  <arg name="enable_gazebo_interface" default="true" />
+
+  <arg name="car_name" default="audi_bot" />
+
+  <!-- Initial start -->
+  <arg name="car_init_x" default="29.05" />
+  <arg name="car_init_y" default="-5.05" />
+  <arg name="car_init_yaw" default="3.141592653589793" />
+
+  <!-- <arg name="car_init_x" default="26.1592750549" />
+  <arg name="car_init_y" default="-8.16411304474"/>
+  <arg name="car_init_yaw" default="4.014257279586958" /> -->
+
+  <!-- <arg name="car_init_x" default="25.5930919647" />
+  <arg name="car_init_y" default="-8.994437217771"/>
+  <arg name="car_init_yaw" default="4.1887902047863905" /> -->
+
+  <!-- <arg name="goal_x" default="25.1796913147" />
+  <arg name="goal_y" default="-9.91046237946" />
+  <arg name="goal_yaw" default="4.363323129985824" /> -->
+
+  <!-- final goal 270 degree -->
+  <arg name="goal_x" default="23.356470108" />
+  <arg name="goal_y" default="-10.8865289688" />
+  <arg name="goal_yaw" default="4.71238898038469" />
+  <!--arg name="goal_yaw" default="1.570796" /-->
+
+  <!-- <arg name="car_init_x" default="30.45" />
+  <arg name="car_init_y" default="-6.05" />
+  <arg name="car_init_yaw" default="4.5378573071795865" /> -->
+
+  <!--<arg name="goal_x" default="29.7418785095" />
+  <arg name="goal_y" default="-7.92293357849" />
+  <arg name="goal_yaw" default="4.1887902047863905" /> -->
+  <!-- <arg name="goal_x" default="30.17786678894" />
+  <arg name="goal_y" default="-7.01744270325" />
+  <arg name="goal_yaw" default="4.363322307179586" /> -->
+
+  <!-- <arg name="car_init_x" default="30.55" />
+  <arg name="car_init_y" default="-5.05" />
+  <arg name="car_init_yaw" default="4.71238898" />
+  <arg name="goal_x" default="30.55" />
+  <arg name="goal_y" default="-15.05" />
+  <arg name="goal_yaw" default="4.5378" /> -->
+
+  <!-- <arg name="car_init_x" default="30.55" />
+  <arg name="car_init_y" default="-5.05" />
+  <arg name="car_init_yaw" default="4.71238898" />
+  <arg name="goal_x" default="29.155286" />
+  <arg name="goal_y" default="-18.238992" />
+  <arg name="goal_yaw" default="4.011" /> -->
+
+
+  <arg name="car_update_freq" default="10.0" />
+  <arg name="car_reference_frame" default="" />
+  <arg name="car_position_topic" default="/planner/position_update" />
+
+  <!-- Load global parameters -->
+  <group ns="global">
+    <rosparam command="load" file="$(find car_description)/map/map.yaml" />
+    <rosparam command="load" file="$(find car_description)/map/global_settings.yaml" />
+    <rosparam command="load" file="$(find car_description)/map/motion_primitive.yaml" />
+  </group>
+
+  <!-- Gazebo World -->
+  <include file="$(find car_description)/launch/gazebo_world.launch" >
+    <arg name="world_name" value="$(find car_description)/urdf/world/sample.world" />
+    <arg name="robot_name" value="$(arg car_name)" />
+    <arg name="robot_x" value="$(arg car_init_x)" />
+    <arg name="robot_y" value="$(arg car_init_y)" />
+    <arg name="robot_yaw" value="$(arg car_init_yaw)" />
+    <arg name="headless" value="false" />
+  </include>
+
+  <!-- Bring up the gazebo interface -->
+  <group if="$(arg enable_gazebo_interface)">
+    <include file="$(find gazebo_interface)/launch/gazebo_interface.launch">
+      <arg name="model_name" value="$(arg car_name)" />
+      <arg name="model_init_x" value="$(arg car_init_x)" />
+      <arg name="model_init_y" value="$(arg car_init_y)" />
+      <arg name="model_init_yaw" value="$(arg car_init_yaw)" />
+      <arg name="execution_frequency" value="$(arg car_update_freq)" />
+      <arg name="model_reference_name" value="$(arg car_reference_frame)" />
+      <arg name="position_update_topic" value="$(arg car_position_topic)" />
+    </include>
+  </group>
+
+  <!-- Bring up the planner -->
+  <group ns="planner" if="$(arg enable_planner)">
+    <include file="$(find ara_star_planner)/launch/planner.launch">
+      <!--arg name="goal_x" value="$(arg goal_x)" /-->
+      <!--arg name="goal_y" value="$(arg goal_y)" /-->
+      <!--arg name="goal_yaw" value="$(arg goal_yaw)" /-->
+    </include>
+  </group>
+
+  <!-- Bring up the dynamic obstacle -->
+  <group ns="obs_planner" if="$(arg enable_dynamic_obstacle)">
+    <include file="$(find dynamic_obstacle_planner)/launch/dynamic_obstacle.launch" />
+  </group>
+
+</launch>
